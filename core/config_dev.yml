@@ -1,0 +1,28 @@
+server:
+  host: "192.168.21.130"
+
+devices_addr:
+  channel_camera_ip: "192.168.24.114"   # 通道相机设备IP
+  parking_camera_ip: "192.168.24.115"   # 车位相机设备IP
+  lora_node_ip: "192.168.24.116"        # Lora节点设备IP
+  four_bytes_node_ip: "192.168.24.117"  # 四字节节点设备IP
+  network_led_ip: "192.168.24.118"      # 网络LED屏设备IP
+  network_lcd_ip: "192.168.24.119"      # LCD一体屏设备IP
+
+
+devices_info:
+  channel_camera:
+    device_id: "SY17711123"
+    device_version: "RDD.CSA.S1A.1.0"
+
+  parking_camera:
+    device_type: 0x00  # 协议定义的设备类型
+    device_version: 0x0400  # 协议定义的设备版本
+
+  network_led:
+    device_type: 0x0C  # DSP类别（网络版LED屏）
+    device_version: 0x0400  # 设备版本号
+
+  lora_node: ""
+  four_bytes_node: ""
+  network_ldc: ""
