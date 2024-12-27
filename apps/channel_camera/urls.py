@@ -95,48 +95,8 @@ def handle_exceptions(func):
             return func(*args, **kwargs)
         except Exception as e:
             logger.exception(f"通道相机接口调用时系统异常: {e}")
-            return error_response()
+            return {}
     return wrapper
-
-
-def coming_record(message):
-    """
-    请求进入时统一记录请求参数
-    :return:
-    """
-    return logger.info(f"{message}被调用，请求参数: {request.get_data(as_text=True)}")
-
-
-def success_response(message="成功", data=None):
-    """生成成功响应"""
-    response_data = {"message": message, "data": data}
-    return Response(
-        json.dumps(response_data, ensure_ascii=False),
-        content_type="application/json; charset=utf-8",
-        status=200
-    )
-
-
-def error_response(message="系统异常", code=500):
-    """生成失败响应"""
-    response_data = {"message": message}
-    return Response(
-        json.dumps(response_data, ensure_ascii=False),
-        content_type="application/json; charset=utf-8",
-        status=code
-    )
-
-
-def validate_json(required_fields, request_data):
-    """
-    校验接口JSON传参的必填参数
-    校验通过返回None
-    校验失败返回错误信息，包含缺少的具体参数信息
-    """
-    missing_fields = [field for field in required_fields if field not in request_data]
-    if missing_fields:
-        return error_response(f"缺少必填参数: {','.join(missing_fields)}", 400)
-    return None
 
 
 def get_channel_camera():
@@ -158,7 +118,7 @@ def connect():
     camera = get_channel_camera()
     camera.connect()
     logger.info("通道相机成功连接服务器")
-    return success_response()
+    return {"success"}
 
 
 @channel_camera_router.get('/disconnect')
@@ -172,7 +132,7 @@ def disconnect():
     camera = get_channel_camera()
     camera.disconnect()
     logger.info("通道相机成功断开连接")
-    return success_response()
+    return {"success"}
 
 
 @channel_camera_router.get('/startHeartbeat')
@@ -186,7 +146,7 @@ def start_heartbeat():
     camera = get_channel_camera()
     camera.start_heartbeat()
     logger.info("通道相机成功开启心跳")
-    return success_response()
+    return {"success"}
 
 
 @channel_camera_router.get('/stopHeartbeat')
@@ -200,7 +160,7 @@ def stop_heartbeat():
     camera = get_channel_camera()
     camera.stop_heartbeat()
     logger.info("通道相机成功停止心跳")
-    return success_response()
+    return {"success"}
 
 
 @channel_camera_router.post('/sendCustomCommand')
@@ -216,7 +176,6 @@ def send_custom_command():
         commandCode (str): 指令类型，不传默认为T包
     :return:
     """
-    coming_record("通道相机sendCustomCommand接口")
     # 检验必填参数
     data = request.get_json()
     validation_error = validate_json(["commandData"], data)
@@ -230,7 +189,7 @@ def send_custom_command():
     camera = get_channel_camera()
     camera.send_command(command_data, command_code)
     logger.info(f"通道相机自定义指令成功发送指令: {command_data}")
-    return success_response()
+    return {"success"}
 
 
 @channel_camera_router.post('/alarmReport')
@@ -249,7 +208,6 @@ def alarm_report():
         moreInfo (str)：更多详细信息
     :return:
     """
-    coming_record("通道相机alarmReport接口")
     # 检验必填参数
     data = request.get_json()
     validation_error = validate_json(["message"], data)
@@ -276,7 +234,7 @@ def alarm_report():
     camera = get_channel_camera()
     camera.send_command(content, "T")
     logger.info(f"通道相机成功上报告警: {message}")
-    return success_response()
+    return {"success"}
 
 
 @channel_camera_router.post('/alarmRecoveryReport')
@@ -296,7 +254,6 @@ def alarm_recovery_report():
     moreInfo (str)：更多详细信息
     :return:
     """
-    coming_record("通道相机alarmRecoveryReport接口")
     # 检验必填参数
     data = request.get_json()
     validation_error = validate_json(["message"], data)
@@ -323,7 +280,7 @@ def alarm_recovery_report():
     camera = get_channel_camera()
     camera.send_command(content, "T")
     logger.info(f"通道相机成功上报告警恢复: {message}")
-    return success_response()
+    return {"success"}
 
 
 @channel_camera_router.post('/carTriggerEvent')
@@ -343,7 +300,6 @@ def car_trigger_event():
         carColour (int)：车身颜色——0：无  1："白",  2："黑", 3："蓝", 4："黄", 5："绿"，6："红"
     :return:
     """
-    coming_record("通道相机carTriggerEvent接口")
     # 检验必填参数
     required_fields = ["triggerFlag", "plate", "plateReliability", "carType", "carColour"]
     data = request.get_json()
@@ -385,7 +341,7 @@ def car_trigger_event():
     camera = get_channel_camera()
     camera.send_command(content, "T")
     logger.info(f"通道相机成功上报事件类型: {trigger_flag}")
-    return success_response()
+    return {"success"}
 
 
 @channel_camera_router.post('/carBackEvent')
@@ -405,7 +361,6 @@ def car_back_event():
         carColour (int)：车身颜色——0：无  1："白",  2："黑", 3："蓝", 4："黄", 5："绿"，6："红"
     :return:
     """
-    coming_record("通道相机carBackEvent接口")
     # 检验必填参数
     required_fields = ["triggerFlag", "plate", "plateReliability", "carType", "carColour"]
     data = request.get_json()
@@ -447,7 +402,7 @@ def car_back_event():
     camera = get_channel_camera()
     camera.send_command(content, "T")
     logger.info(f"通道相机成功上报后退事件: {trigger_flag}")
-    return success_response()
+    return {"success"}
 
 
 @channel_camera_router.post('/carTrafficEvent')
@@ -465,7 +420,6 @@ def car_traffic_event():
         car_num (int)： 车辆数量
     :return:
     """
-    coming_record("通道相机carTrafficEvent接口")
     # 检验必填参数
     required_fields = ["areaState", "areaStateReliability", "carNum"]
     data = request.get_json()
@@ -498,4 +452,4 @@ def car_traffic_event():
     camera = get_channel_camera()
     camera.send_command(content, "T")
     logger.info(f"通道相机成功上报交通流量状态: {data['areaState']}")
-    return success_response()
+    return {"success"}

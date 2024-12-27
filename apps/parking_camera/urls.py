@@ -15,7 +15,7 @@ from core.util import get_inner_picture
 from .services import ParkingCameraService
 
 # 创建路由
-parking_camera_router = APIRouter()
+parking_camera_router = APIRouter(tags=["车位相机相关接口"])
 
 
 # 枚举类，维护各种数据类型对应值
@@ -24,6 +24,7 @@ class ParkingEvent(Enum):
     车位状态枚举值
     0：无车；1：有车；2：出车；3：进车；4：设备故障；5：压线告警：6：压线取消
     """
+
     NO_CAR = 0
     HAS_CAR = 1
     CAR_OUT = 2
@@ -36,6 +37,7 @@ class ParkingEvent(Enum):
 # 公共工具函数和装饰器
 def handle_exceptions(func):
     """通用异常处理装饰器"""
+
     @wraps(func)
     def wrapper(*args, **kwargs):
         try:
@@ -43,6 +45,7 @@ def handle_exceptions(func):
         except Exception as e:
             logger.exception(f"调用车位相机接口时系统异常: {e}")
             return error_response("系统异常", 500)
+
     return wrapper
 
 
@@ -60,7 +63,7 @@ def success_response(message="成功", data=None):
     return Response(
         json.dumps(response_data, ensure_ascii=False),
         content_type="application/json; charset=utf-8",
-        status=200
+        status=200,
     )
 
 
@@ -70,7 +73,7 @@ def error_response(message="系统异常", code=500):
     return Response(
         json.dumps(response_data, ensure_ascii=False),
         content_type="application/json; charset=utf-8",
-        status=code
+        status=code,
     )
 
 
@@ -100,7 +103,9 @@ def validate_form_field(field_name, data, valid_values=None):
     except (TypeError, ValueError):
         return error_response(f"缺少必填参数: {field_name}或参数不是有效的整数", 400)
     if valid_values and value not in valid_values:
-        return error_response(f"错误的参数值: {field_name}={value}，有效范围: {valid_values}", 400)
+        return error_response(
+            f"错误的参数值: {field_name}={value}，有效范围: {valid_values}", 400
+        )
     return value
 
 
@@ -111,7 +116,7 @@ def get_parking_camera():
 
 
 # 核心 API 路由
-@parking_camera_router.get('/connect')
+@parking_camera_router.get("/connect", summary="连接设备到服务器")
 @handle_exceptions
 def connect():
     """
@@ -126,7 +131,7 @@ def connect():
     return success_response()
 
 
-@parking_camera_router.get('/disconnect')
+@parking_camera_router.get("/disconnect")
 @handle_exceptions
 def disconnect():
     """
@@ -140,7 +145,7 @@ def disconnect():
     return success_response()
 
 
-@parking_camera_router.get('/startHeartbeat')
+@parking_camera_router.get("/startHeartbeat")
 @handle_exceptions
 def start_heartbeat():
     """
@@ -154,7 +159,7 @@ def start_heartbeat():
     return success_response()
 
 
-@parking_camera_router.get('/stopHeartbeat')
+@parking_camera_router.get("/stopHeartbeat")
 @handle_exceptions
 def stop_heartbeat():
     """
@@ -168,7 +173,7 @@ def stop_heartbeat():
     return success_response()
 
 
-@parking_camera_router.post('/parkingStatusReport')
+@parking_camera_router.post("/parkingStatusReport")
 @handle_exceptions
 def parking_status_report():
     """
@@ -188,18 +193,18 @@ def parking_status_report():
     park_num = data["port"]
     park_event = data["parkEvent"]
 
-    if park_num not in range(1, 7):     # 车位号范围1-6
+    if park_num not in range(1, 7):  # 车位号范围1-6
         return error_response(f"错误的车位号: {park_num}，范围应为1-6", 400)
     if park_event not in (item.value for item in ParkingEvent):
         return error_response(f"错误的事件类型: {park_event}，范围应为0-6", 400)
 
-    parking_camera = get_parking_camera()   # 获取设备实例
-    parking_camera.send_parking_status(park_num, park_event)    # 上报车位状态
+    parking_camera = get_parking_camera()  # 获取设备实例
+    parking_camera.send_parking_status(park_num, park_event)  # 上报车位状态
     logger.info(f"车位相机上报车位状态成功，车位号: {park_num}, 车位状态: {park_event}")
     return success_response()
 
 
-@parking_camera_router.post('/startParkingStatusReport')
+@parking_camera_router.post("/startParkingStatusReport")
 @handle_exceptions
 def start_parking_status_report():
     """
@@ -231,7 +236,7 @@ def start_parking_status_report():
     return success_response()
 
 
-@parking_camera_router.get('/stopParkingStatusReport')
+@parking_camera_router.get("/stopParkingStatusReport")
 @handle_exceptions
 def stop_parking_status_report():
     """停止持续上报车位状态"""
@@ -241,7 +246,7 @@ def stop_parking_status_report():
     return success_response()
 
 
-@parking_camera_router.post('/uploadParkingPicture')
+@parking_camera_router.post("/uploadParkingPicture")
 @handle_exceptions
 def upload_parking_picture():
     """
@@ -267,8 +272,8 @@ def upload_parking_picture():
         return model
 
     # 校验image和innerPic至少存在一个
-    image = request.files.get('image')  # 上传的图片文件
-    inner_pic = request.form.get('innerPic')  # 内置图片名称
+    image = request.files.get("image")  # 上传的图片文件
+    inner_pic = request.form.get("innerPic")  # 内置图片名称
     if not image and not inner_pic:
         return error_response("image或innerPic至少需要填一个", 400)
 
@@ -280,17 +285,21 @@ def upload_parking_picture():
     # 当模式为硬识别时，三个参数必填
     if model == 1:
         if any(i is None for i in [plate_color, plate_number, confidence]):
-            return error_response("模式为硬识别时，plateColor、plateNumber和confidence三个参数必填", 400)
+            return error_response(
+                "模式为硬识别时，plateColor、plateNumber和confidence三个参数必填", 400
+            )
 
     # 获取图片数据
-    if inner_pic:   # 如果有内置图片，尝试获取，忽略自定义上传图片参数
+    if inner_pic:  # 如果有内置图片，尝试获取，忽略自定义上传图片参数
         image_bytes = get_inner_picture(inner_pic)
         if image_bytes is None:
             return error_response(f"无法找到内置图片: {inner_pic}", 400)
     else:
         image_bytes = image.read()  # 如果没有指定内置图片，将上传的文件转换为二进制数据
 
-    parking_camera = get_parking_camera()   # 获取设备实例
-    parking_camera.upload_picture(park_num, image_bytes, model, plate_color, plate_number, confidence)    # 上传图片
+    parking_camera = get_parking_camera()  # 获取设备实例
+    parking_camera.upload_picture(
+        park_num, image_bytes, model, plate_color, plate_number, confidence
+    )  # 上传图片
     logger.info(f"车位相机{park_num}号车位成功上报车位图片")
     return success_response()

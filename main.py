@@ -27,5 +27,10 @@ app.include_router(network_led_router, prefix="/network_led")
 app.include_router(network_lcd_router, prefix="/network_lcd")
 
 
+@app.get("/")
+def main():
+    return {"hello"}
+
+
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run(app="main:app", host="127.0.0.1", port=8000, reload=True)

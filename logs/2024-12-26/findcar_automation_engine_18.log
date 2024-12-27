@@ -1,0 +1,30 @@
+2024-12-26 18:15:49.9211 | events:41 | INFO | 开始检查当前环境是否满足配置文件中设备所需全部IP
+2024-12-26 18:15:49.9354 | events:50 | INFO | 配置文件中所需的所有设备IP地址: ['192.168.24.114', '192.168.24.115', '192.168.24.116', '192.168.24.117', '192.168.24.118', '192.168.24.119']，对应设备名称: ['channel_camera_ip', 'parking_camera_ip', 'lora_node_ip', 'four_bytes_node_ip', 'network_led_ip', 'network_lcd_ip']
+2024-12-26 18:15:49.9354 | events:63 | INFO | 环境满足，开始初始化设备
+2024-12-26 18:15:49.9465 | device_manager:65 | INFO | 通道相机设备初始化成功
+2024-12-26 18:15:49.9580 | device_manager:76 | INFO | 车位相机设备初始化成功
+2024-12-26 18:15:49.9601 | services:244 | INFO | 车位相机收到服务器的车位状态上报返回：{'protocol_head': '0xfb', 'timestamp': 1735208149, 'command_code': 'S', 'total_packets': 1, 'packet_number': 0, 'data_length': 1, 'data_content': '\x00', 'checksum': 554, 'protocol_tail': '0xfe'}
+2024-12-26 18:15:49.9601 | device_manager:86 | INFO | Lora节点初始化成功
+2024-12-26 18:15:49.9637 | device_manager:96 | INFO | 四字节网络节点初始化成功
+2024-12-26 18:15:49.9667 | device_manager:107 | INFO | 网络led屏初始化成功
+2024-12-26 18:15:49.9820 | device_manager:118 | INFO | 网络lcd一体屏初始化成功
+2024-12-26 18:15:49.9820 | events:66 | INFO | 所有设备初始化成功
+2024-12-26 18:15:49.9980 | events:73 | INFO | sqlite初始化成功
+2024-12-26 18:15:50.0155 | services:82 | INFO | LCD一体屏收到来自服务器的指令 {'code': 5000, 'message': '屏地址[24119119]有误，未查询到屏信息！', 'data': ''}
+2024-12-26 18:15:50.0155 | services:91 | INFO | LCD一体屏指令响应包发送成功，reqid：None
+2024-12-26 18:15:50.0384 | services:95 | INFO | LCD一体屏录入接收到的下发指令到数据库成功{"code":5000,"message":"屏地址[24119119]有误，未查询到屏信息！","data":""}
+2024-12-26 18:16:40.4986 | events:41 | INFO | 开始检查当前环境是否满足配置文件中设备所需全部IP
+2024-12-26 18:16:40.5124 | events:50 | INFO | 配置文件中所需的所有设备IP地址: ['192.168.24.114', '192.168.24.115', '192.168.24.116', '192.168.24.117', '192.168.24.118', '192.168.24.119']，对应设备名称: ['channel_camera_ip', 'parking_camera_ip', 'lora_node_ip', 'four_bytes_node_ip', 'network_led_ip', 'network_lcd_ip']
+2024-12-26 18:16:40.5124 | events:63 | INFO | 环境满足，开始初始化设备
+2024-12-26 18:16:40.5249 | device_manager:65 | INFO | 通道相机设备初始化成功
+2024-12-26 18:16:40.5357 | device_manager:76 | INFO | 车位相机设备初始化成功
+2024-12-26 18:16:40.5357 | services:244 | INFO | 车位相机收到服务器的车位状态上报返回：{'protocol_head': '0xfb', 'timestamp': 1735208200, 'command_code': 'S', 'total_packets': 1, 'packet_number': 0, 'data_length': 1, 'data_content': '\x00', 'checksum': 350, 'protocol_tail': '0xfe'}
+2024-12-26 18:16:40.5381 | device_manager:86 | INFO | Lora节点初始化成功
+2024-12-26 18:16:40.5412 | device_manager:96 | INFO | 四字节网络节点初始化成功
+2024-12-26 18:16:40.5456 | device_manager:107 | INFO | 网络led屏初始化成功
+2024-12-26 18:16:40.5568 | device_manager:118 | INFO | 网络lcd一体屏初始化成功
+2024-12-26 18:16:40.5568 | events:66 | INFO | 所有设备初始化成功
+2024-12-26 18:16:40.5599 | events:73 | INFO | sqlite初始化成功
+2024-12-26 18:16:40.6113 | services:82 | INFO | LCD一体屏收到来自服务器的指令 {'code': 5000, 'message': '屏地址[24119119]有误，未查询到屏信息！', 'data': ''}
+2024-12-26 18:16:40.6113 | services:91 | INFO | LCD一体屏指令响应包发送成功，reqid：None
+2024-12-26 18:16:40.6550 | services:95 | INFO | LCD一体屏录入接收到的下发指令到数据库成功{"code":5000,"message":"屏地址[24119119]有误，未查询到屏信息！","data":""}

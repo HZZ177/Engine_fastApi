@@ -41,9 +41,9 @@ logger.configure(
             "sink": f"{log_path}/{current_date}/findcar_automation_engine_{current_hour}.log",  # 指定日志输出到文件
             "level": "INFO",  # 日志级别
             "format": "{time:YYYY-MM-DD HH:mm:ss.SSSS} | {module}:{line} | {level} | {message}",  # 日志格式
-            "rotation": "1 hour",  # 每小时/文件大小达到100MB 这两种条件时，自动分割日志
+            "rotation": "1 hour",  # 每小时自动分割日志
             "retention": "1 week",  # 保留最近 7 天的日志文件
-            "compression": None,  # 压缩日志文件
+            "compression": "zip",  # 压缩日志文件
             "backtrace": True,   # 控制是否追溯详细的回溯信息（即代码调用链和变量状态等详细信息）
             "diagnose": True,  # 控制是否包含详细的诊断信息
             "enqueue": False,  # 关闭多线程安全队列
