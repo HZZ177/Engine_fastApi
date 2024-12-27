@@ -13,7 +13,7 @@ from core.device_manager import DeviceManager
 from .services import FourBytesNodeService
 
 # 创建路由
-four_bytes_node_router = APIRouter(tags=["四字节网络节点相关接口"])
+four_bytes_node_router = APIRouter()
 
 
 # 工具函数和装饰器

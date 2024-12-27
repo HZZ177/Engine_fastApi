@@ -15,7 +15,7 @@ from core.util import get_inner_picture
 from .services import ParkingCameraService
 
 # 创建路由
-parking_camera_router = APIRouter(tags=["车位相机相关接口"])
+parking_camera_router = APIRouter()
 
 
 # 枚举类，维护各种数据类型对应值

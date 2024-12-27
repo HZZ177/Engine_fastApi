@@ -13,7 +13,7 @@ from core.device_manager import DeviceManager
 from .services import LoraNodeService
 
 # 创建路由
-lora_router = APIRouter(tags=["Lora节点相关接口"])
+lora_router = APIRouter()
 
 
 # 工具函数和装饰器

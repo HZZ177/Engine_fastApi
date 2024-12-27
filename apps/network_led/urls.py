@@ -13,7 +13,7 @@ from .services import NetworkLedService
 from core.device_manager import DeviceManager
 
 # 创建路由
-network_led_router = APIRouter(tags=["LED网络屏相关接口"])
+network_led_router = APIRouter()
 
 
 # 工具函数和装饰器

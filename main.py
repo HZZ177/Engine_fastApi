@@ -20,11 +20,11 @@ app.add_middleware(RequestLoggingMiddleware)    # 日志记录每个请求信息
 
 # 注册路由
 app.include_router(lora_router, prefix="/lora_node", tags=["lora节点相关接口"])
-app.include_router(channel_camera_router, prefix="/channel_camera")
-app.include_router(four_bytes_node_router, prefix="/four_bytes_node")
-app.include_router(parking_camera_router, prefix="/parking_camera")
-app.include_router(network_led_router, prefix="/network_led")
-app.include_router(network_lcd_router, prefix="/network_lcd")
+app.include_router(channel_camera_router, prefix="/channel_camera", tags=["通道相机相关接口"])
+app.include_router(four_bytes_node_router, prefix="/four_bytes_node", tags=["四字节网络节点相关接口"])
+app.include_router(parking_camera_router, prefix="/parking_camera", tags=["车位相机相关接口"])
+app.include_router(network_led_router, prefix="/network_led", tags=["LED网络屏相关接口"])
+app.include_router(network_lcd_router, prefix="/network_lcd", tags=["LCD一体屏相关接口"])
 
 
 @app.get("/")

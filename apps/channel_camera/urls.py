@@ -5,9 +5,8 @@
 # @File    : channel_camera_api.py
 # @Software: PyCharm
 # @description:
-import json
+
 import time
-from functools import wraps
 from enum import Enum
 from fastapi import APIRouter
 from core.logger import logger
@@ -15,9 +14,11 @@ from core.configer import config
 from core.util import generate_uuid
 from core.device_manager import DeviceManager
 from .services import ChannelCameraService
+from core.util import handle_exceptions
+from .schemas import CustomCommandData
 
 # 创建路由
-channel_camera_router = APIRouter(tags=["通道相机相关接口"])
+channel_camera_router = APIRouter()
 
 
 # 从配置文件获取通道相机设备信息
@@ -86,19 +87,6 @@ class CameraFaultType(Enum):
     NET_FAULT = "NetFault"
 
 
-# 工具函数和装饰器
-def handle_exceptions(func):
-    """通用异常处理装饰器"""
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        try:
-            return func(*args, **kwargs)
-        except Exception as e:
-            logger.exception(f"通道相机接口调用时系统异常: {e}")
-            return {}
-    return wrapper
-
-
 def get_channel_camera():
     """获取通道相机设备实例"""
     service: ChannelCameraService = DeviceManager.get_channel_camera_service()
@@ -106,23 +94,22 @@ def get_channel_camera():
 
 
 # API 路由
-@channel_camera_router.get('/connect')
-@handle_exceptions
+@channel_camera_router.get('/connect', summary="连接到服务器")
+@handle_exceptions(model_name="通道相机相关接口")
 def connect():
     """
     尝试连接设备到服务器
     连接后发送注册包并开启心跳
     :return:
     """
-    logger.info("通道相机connect接口被调用")
     camera = get_channel_camera()
     camera.connect()
     logger.info("通道相机成功连接服务器")
-    return {"success"}
+    return {"message": "成功连接服务器"}
 
 
-@channel_camera_router.get('/disconnect')
-@handle_exceptions
+@channel_camera_router.get('/disconnect', summary="断开连接")
+@handle_exceptions(model_name="通道相机相关接口")
 def disconnect():
     """
     断开服务器连接
@@ -132,11 +119,11 @@ def disconnect():
     camera = get_channel_camera()
     camera.disconnect()
     logger.info("通道相机成功断开连接")
-    return {"success"}
+    return {"message": "成功断连"}
 
 
-@channel_camera_router.get('/startHeartbeat')
-@handle_exceptions
+@channel_camera_router.get('/startHeartbeat', summary="开启心跳")
+@handle_exceptions(model_name="通道相机相关接口")
 def start_heartbeat():
     """
     开启持续心跳
@@ -146,11 +133,11 @@ def start_heartbeat():
     camera = get_channel_camera()
     camera.start_heartbeat()
     logger.info("通道相机成功开启心跳")
-    return {"success"}
+    return {"message": "开启心跳成功"}
 
 
-@channel_camera_router.get('/stopHeartbeat')
-@handle_exceptions
+@channel_camera_router.get('/stopHeartbeat', summary="停止心跳")
+@handle_exceptions(model_name="通道相机相关接口")
 def stop_heartbeat():
     """
     停止心跳
@@ -160,12 +147,12 @@ def stop_heartbeat():
     camera = get_channel_camera()
     camera.stop_heartbeat()
     logger.info("通道相机成功停止心跳")
-    return {"success"}
+    return {"message": "停止心跳成功"}
 
 
-@channel_camera_router.post('/sendCustomCommand')
-@handle_exceptions
-def send_custom_command():
+@channel_camera_router.post('/sendCustomCommand', summary="自定义指令发送")
+@handle_exceptions(model_name="通道相机相关接口")
+def send_custom_command(data: CustomCommandData):
     """
     工具方法，构造数据体向服务器上报指令，默认T包
     请求参数中需要自己提供发送的所有消息体部分
@@ -176,24 +163,16 @@ def send_custom_command():
         commandCode (str): 指令类型，不传默认为T包
     :return:
     """
-    # 检验必填参数
-    data = request.get_json()
-    validation_error = validate_json(["commandData"], data)
-    if validation_error:
-        return validation_error
-
-    # 校验参数合法性
-    command_data = data["commandData"]
-    command_code = data.get("commandCode", "T")
-
+    command_data = data.commandData
+    command_code = data.commandCode
     camera = get_channel_camera()
     camera.send_command(command_data, command_code)
     logger.info(f"通道相机自定义指令成功发送指令: {command_data}")
-    return {"success"}
+    return {"message": "自定义指令发送成功"}
 
 
-@channel_camera_router.post('/alarmReport')
-@handle_exceptions
+@channel_camera_router.post('/alarmReport', summary="告警上报")
+@handle_exceptions(model_name="通道相机相关接口")
 def alarm_report():
     """
     告警上报接口
@@ -234,11 +213,11 @@ def alarm_report():
     camera = get_channel_camera()
     camera.send_command(content, "T")
     logger.info(f"通道相机成功上报告警: {message}")
-    return {"success"}
+    return {"message": "告警上报成功"}
 
 
-@channel_camera_router.post('/alarmRecoveryReport')
-@handle_exceptions
+@channel_camera_router.post('/alarmRecoveryReport', summary="告警恢复上报")
+@handle_exceptions(model_name="通道相机相关接口")
 def alarm_recovery_report():
     """
     告警恢复上报接口
@@ -280,11 +259,11 @@ def alarm_recovery_report():
     camera = get_channel_camera()
     camera.send_command(content, "T")
     logger.info(f"通道相机成功上报告警恢复: {message}")
-    return {"success"}
+    return {"message": "告警恢复上报成功"}
 
 
-@channel_camera_router.post('/carTriggerEvent')
-@handle_exceptions
+@channel_camera_router.post('/carTriggerEvent', summary="相机来去车事件上报")
+@handle_exceptions(model_name="通道相机相关接口")
 def car_trigger_event():
     """
     相机来去车事件上报接口
@@ -341,11 +320,11 @@ def car_trigger_event():
     camera = get_channel_camera()
     camera.send_command(content, "T")
     logger.info(f"通道相机成功上报事件类型: {trigger_flag}")
-    return {"success"}
+    return {"message": "来去车事件上报成功"}
 
 
-@channel_camera_router.post('/carBackEvent')
-@handle_exceptions
+@channel_camera_router.post('/carBackEvent', summary="相机后退事件上报")
+@handle_exceptions(model_name="通道相机相关接口")
 def car_back_event():
     """
     相机后退事件上报接口
@@ -402,11 +381,11 @@ def car_back_event():
     camera = get_channel_camera()
     camera.send_command(content, "T")
     logger.info(f"通道相机成功上报后退事件: {trigger_flag}")
-    return {"success"}
+    return {"message": "相机后退事件上报成功"}
 
 
-@channel_camera_router.post('/carTrafficEvent')
-@handle_exceptions
+@channel_camera_router.post('/carTrafficEvent', summary="相机交通流量状态上报")
+@handle_exceptions(model_name="通道相机相关接口")
 def car_traffic_event():
     """
     相机交通流量状态上报接口
@@ -452,4 +431,4 @@ def car_traffic_event():
     camera = get_channel_camera()
     camera.send_command(content, "T")
     logger.info(f"通道相机成功上报交通流量状态: {data['areaState']}")
-    return {"success"}
+    return {"message": "相机交通流量状态上报成功"}

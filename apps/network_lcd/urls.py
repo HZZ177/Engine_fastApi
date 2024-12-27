@@ -13,7 +13,7 @@ from .services import NetworkLcdService
 from core.device_manager import DeviceManager
 
 # 创建路由
-network_lcd_router = APIRouter(tags=["LCD一体屏相关接口"])
+network_lcd_router = APIRouter()
 
 
 # 工具函数和装饰器

@@ -37,7 +37,7 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
         path = request.url.path
         query_params = dict(request.query_params)  # 查询参数
 
-        logger.info(f"接口{path}被调用")
+        logger.info(f"【接口调用】- 接口{path}被调用")
 
         # 获取请求体（如果存在）
         request_body = None

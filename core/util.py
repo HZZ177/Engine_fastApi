@@ -8,6 +8,8 @@
 
 import re
 import uuid
+from functools import wraps
+from fastapi import HTTPException
 from .file_path import static_path
 from .logger import logger
 
@@ -32,3 +34,17 @@ def get_inner_picture(inner_pic_name):
 def generate_uuid():
     """生成UUID"""
     return str(uuid.uuid4())
+
+
+def handle_exceptions(model_name: str):
+    """通用异常处理装饰器"""
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            try:
+                return func(*args, **kwargs)
+            except Exception as e:
+                logger.exception(f"{model_name}被调用时发生异常: {e}")
+                return HTTPException(status_code=500, detail=f"{model_name}被调用时发生异常")
+        return wrapper
+    return decorator
