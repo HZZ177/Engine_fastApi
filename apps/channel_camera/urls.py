@@ -263,7 +263,7 @@ def car_traffic_event(data: CarTrafficEventModel):
         area_state_reliability (int)： 区域状态可信度
         car_num (int)： 车辆数量
     """
-    area_state = data.areaState
+    area_state = data.areaState.value
     area_state_reliability = data.area_state_reliability
     car_num = data.car_num
 
@@ -281,5 +281,5 @@ def car_traffic_event(data: CarTrafficEventModel):
 
     camera = get_channel_camera()
     camera.send_command(content, "T")
-    logger.info(f"通道相机成功上报交通流量状态: {data['areaState']}")
+    logger.info(f"通道相机成功上报交通流量状态: {data.areaState.value}")
     return {"message": "相机交通流量状态上报成功"}
