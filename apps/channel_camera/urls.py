@@ -13,7 +13,7 @@ from core.configer import config
 from core.util import generate_uuid
 from core.device_manager import DeviceManager
 from .services import ChannelCameraService
-from core.util import handle_exceptions
+from core.util import handle_exceptions, return_success_response
 from .schemas import CustomCommandModel, AlarmReportModel, AlarmRecoveryReportModel, CarTriggerEventModel, \
     CarBackEventModel, CarTrafficEventModel
 
@@ -42,7 +42,7 @@ def connect():
     camera = get_channel_camera()
     camera.connect()
     logger.info("通道相机成功连接服务器")
-    return {"message": "成功连接服务器"}
+    return return_success_response(message="成功连接服务器")
 
 
 @channel_camera_router.get('/disconnect', summary="断开连接")
@@ -53,7 +53,7 @@ def disconnect():
     camera = get_channel_camera()
     camera.disconnect()
     logger.info("通道相机成功断开连接")
-    return {"message": "成功断连"}
+    return return_success_response(message="成功断连")
 
 
 @channel_camera_router.get('/startHeartbeat', summary="开启心跳")
@@ -64,7 +64,7 @@ def start_heartbeat():
     camera = get_channel_camera()
     camera.start_heartbeat()
     logger.info("通道相机成功开启心跳")
-    return {"message": "开启心跳成功"}
+    return return_success_response(message="开启心跳成功")
 
 
 @channel_camera_router.get('/stopHeartbeat', summary="停止心跳")
@@ -75,7 +75,7 @@ def stop_heartbeat():
     camera = get_channel_camera()
     camera.stop_heartbeat()
     logger.info("通道相机成功停止心跳")
-    return {"message": "停止心跳成功"}
+    return return_success_response(message="停止心跳成功")
 
 
 @channel_camera_router.post('/sendCustomCommand', summary="自定义指令发送")
@@ -90,7 +90,7 @@ def send_custom_command(data: CustomCommandModel):
     camera = get_channel_camera()
     camera.send_command(command_data, command_code)
     logger.info(f"通道相机自定义指令成功发送指令: {command_data}")
-    return {"message": "自定义指令发送成功"}
+    return return_success_response(message="自定义指令发送成功")
 
 
 @channel_camera_router.post('/alarmReport', summary="告警上报")
@@ -108,7 +108,7 @@ def alarm_report(data: AlarmReportModel):
     选填参数：
         moreInfo (str)：更多详细信息
     """
-    message = data.message
+    message = data.messagereturn_success_response(message="")
     more_info = data.moreInfo
 
     # 组装上报数据
@@ -124,7 +124,7 @@ def alarm_report(data: AlarmReportModel):
     camera = get_channel_camera()
     camera.send_command(content, "T")
     logger.info(f"通道相机成功上报告警: {message}")
-    return {"message": "告警上报成功"}
+    return return_success_response(message=f"告警上报成功：{message}")
 
 
 @channel_camera_router.post('/alarmRecoveryReport', summary="告警恢复上报")
@@ -143,7 +143,7 @@ def alarm_recovery_report(data: AlarmRecoveryReportModel):
     选填参数：
     moreInfo (str)：更多详细信息
     """
-    message = data.message
+    message = data.messagereturn_success_response(message="")
     more_info = data.moreInfo
 
     # 组装上报数据
@@ -159,7 +159,7 @@ def alarm_recovery_report(data: AlarmRecoveryReportModel):
     camera = get_channel_camera()
     camera.send_command(content, "T")
     logger.info(f"通道相机成功上报告警恢复: {message}")
-    return {"message": "告警恢复上报成功"}
+    return return_success_response(message=f"告警恢复上报成功：{message}")
 
 
 @channel_camera_router.post('/carTriggerEvent', summary="相机来去车事件上报")
@@ -178,11 +178,11 @@ def car_trigger_event(data: CarTriggerEventModel):
         carType (str)：车辆类型——小型车/大型车
         carColour (int)：车身颜色——0：无  1："白",  2："黑", 3："蓝", 4："黄", 5："绿"，6："红"
     """
-    trigger_flag = data.triggerFlag  # 触发类型
+    trigger_flag = data.triggerFlagreturn_success_response(message="")  # 触发类型
     plate = data.plate  # 车牌号
     plate_reliability = data.plateReliability  # 车牌可信度
     car_type = data.carType  # 车辆类型
-    car_colour = data.carColour  # 车身颜色
+    car_colour = data.carColourreturn_success_response(message="")  # 车身颜色
 
     # 组装上报数据
     content = {
@@ -202,7 +202,7 @@ def car_trigger_event(data: CarTriggerEventModel):
     camera = get_channel_camera()
     camera.send_command(content, "T")
     logger.info(f"通道相机成功上报事件类型: {trigger_flag}")
-    return {"message": "来去车事件上报成功"}
+    return return_success_response(message=f"来去车事件上报成功：{trigger_flag}")
 
 
 @channel_camera_router.post('/carBackEvent', summary="相机后退事件上报")
@@ -222,11 +222,11 @@ def car_back_event(data: CarBackEventModel):
         carColour (int)：车身颜色——0：无  1："白",  2："黑", 3："蓝", 4："黄", 5："绿"，6："红"
     """
 
-    trigger_flag = data.triggerFlag  # 触发类型
+    trigger_flag = data.triggerFlagreturn_success_response(message="")  # 触发类型
     plate = data.plate  # 车牌号
     plate_reliability = data.plateReliability  # 车牌可信度
     car_type = data.carType  # 车辆类型
-    car_colour = data.carColour  # 车身颜色
+    car_colour = data.carColourreturn_success_response(message="")  # 车身颜色
 
     # 组装上报数据
     content = {
@@ -246,7 +246,7 @@ def car_back_event(data: CarBackEventModel):
     camera = get_channel_camera()
     camera.send_command(content, "T")
     logger.info(f"通道相机成功上报后退事件: {trigger_flag}")
-    return {"message": "相机后退事件上报成功"}
+    return return_success_response(message=f"相机后退事件上报成功：{trigger_flag}")
 
 
 @channel_camera_router.post('/carTrafficEvent', summary="相机交通流量状态上报")
@@ -263,7 +263,7 @@ def car_traffic_event(data: CarTrafficEventModel):
         area_state_reliability (int)： 区域状态可信度
         car_num (int)： 车辆数量
     """
-    area_state = data.areaState.value
+    area_state = data.areaStatereturn_success_response(message="")
     area_state_reliability = data.area_state_reliability
     car_num = data.car_num
 
@@ -281,5 +281,5 @@ def car_traffic_event(data: CarTrafficEventModel):
 
     camera = get_channel_camera()
     camera.send_command(content, "T")
-    logger.info(f"通道相机成功上报交通流量状态: {data.areaState.value}")
-    return {"message": "相机交通流量状态上报成功"}
+    logger.info(f"通道相机成功上报交通流量状态: {area_state}")
+    return return_success_response(message=f"相机交通流量状态上报成功：{area_state}")

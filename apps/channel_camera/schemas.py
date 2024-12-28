@@ -6,19 +6,12 @@
 # @Software: PyCharm
 # @description:
 from typing import Literal
-
-from pydantic import BaseModel, conint
+from pydantic import BaseModel, conint, field_validator
 from enum import Enum
 
 
 # 枚举类，维护各种数据类型对应值
-class EnumBase(Enum):
-    """对枚举类统一处理返回值，默认返回其 value 而不是枚举成员"""
-    def __str__(self):
-        return self.value
-
-
-class CarTriggerFlag(EnumBase):
+class CarTriggerFlag(Enum):
     """
     相机触发事件枚举值
     2-去车
@@ -28,7 +21,7 @@ class CarTriggerFlag(EnumBase):
     FROM_CAR = 3
 
 
-class CarBackFlag(EnumBase):
+class CarBackFlag(Enum):
     """
     相机后退事件枚举值
     9-来车后车辆又后退
@@ -38,7 +31,7 @@ class CarBackFlag(EnumBase):
     BACK_TO_CAR = 10
 
 
-class CarColour(EnumBase):
+class CarColour(Enum):
     """
     车牌颜色枚举值
     0：无  1："白",  2："黑", 3："蓝", 4："黄", 5："绿"，6："红"
@@ -52,7 +45,7 @@ class CarColour(EnumBase):
     RED = 6
 
 
-class AreaState(EnumBase):
+class AreaState(Enum):
     """
     区域交通流量状态枚举值
     0：正常；1：繁忙；2：拥堵
@@ -62,7 +55,7 @@ class AreaState(EnumBase):
     JAM = 2
 
 
-class CameraFaultType(EnumBase):
+class CameraFaultType(Enum):
     """
     相机故障类型枚举值
     videoFault：视频故障
@@ -90,11 +83,16 @@ class AlarmReportModel(BaseModel):
     message: CameraFaultType
     moreInfo: str = ""
 
+    @field_validator("message")
+    @classmethod
+    def transform_park_event(cls, v: CameraFaultType):
+        """转换字段成员对象为真实值，方便后续使用"""
+        return v.value
 
-class AlarmRecoveryReportModel(BaseModel):
+
+class AlarmRecoveryReportModel(AlarmReportModel):
     """报警恢复上报数据模型"""
-    message: CameraFaultType
-    moreInfo: str = ""
+    ...
 
 
 class CarTriggerEventModel(BaseModel):
@@ -105,14 +103,22 @@ class CarTriggerEventModel(BaseModel):
     carType: Literal["小型车", "大型车"]
     carColour: CarColour
 
+    @field_validator("triggerFlag")
+    @classmethod
+    def transform_park_event(cls, v: CarTriggerFlag):
+        """转换字段成员对象为真实值，方便后续使用"""
+        return v.value
 
-class CarBackEventModel(BaseModel):
+    @field_validator("carColour")
+    @classmethod
+    def transform_park_event(cls, v: CarColour):
+        """转换字段成员对象为真实值，方便后续使用"""
+        return v.value
+
+
+class CarBackEventModel(CarTriggerEventModel):
     """相机后退事件数据模型"""
-    triggerFlag: CarBackFlag
-    plate: str
-    plateReliability: conint(ge=0, le=1000)
-    carType: Literal["小型车", "大型车"]
-    carColour: CarColour
+    ...
 
 
 class CarTrafficEventModel(BaseModel):
@@ -121,7 +127,13 @@ class CarTrafficEventModel(BaseModel):
     area_state_reliability: conint(ge=0, le=1000)
     car_num: int
 
+    @field_validator("areaState")
+    @classmethod
+    def transform_park_event(cls, v: AreaState):
+        """转换字段成员对象为真实值，方便后续使用"""
+        return v.value
+
 
 if __name__ == '__main__':
-    data = AlarmRecoveryReportModel(message="videoFault1")
-    print(data.message)
+    data = AlarmRecoveryReportModel(message="videoFault")
+    print(data.message.value)

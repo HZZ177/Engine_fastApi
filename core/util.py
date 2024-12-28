@@ -51,3 +51,11 @@ def handle_exceptions(model_name: str):
                 return HTTPException(status_code=500, detail=f"{model_name}被调用时发生异常")
         return wrapper
     return decorator
+
+
+def return_success_response(message="成功", data=""):
+    """通用的成功响应"""
+    return {
+        "message": message,
+        "data": data
+    }
