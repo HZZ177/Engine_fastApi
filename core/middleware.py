@@ -16,7 +16,7 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         """
         继承自BaseHTTPMiddleware的类必须定义的中间件
-        使用中间件后将请求传递
+        定义中间件的请求流转
         """
         # 记录请求信息
         await self.log_request_info(request)

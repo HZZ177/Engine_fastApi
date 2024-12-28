@@ -27,10 +27,5 @@ app.include_router(network_led_router, prefix="/network_led", tags=["LED网络�
 app.include_router(network_lcd_router, prefix="/network_lcd", tags=["LCD一体屏相关接口"])
 
 
-@app.get("/")
-def main():
-    return {"hello"}
-
-
 if __name__ == "__main__":
     uvicorn.run(app="main:app", host="127.0.0.1", port=8000, reload=True)

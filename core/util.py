@@ -37,7 +37,10 @@ def generate_uuid():
 
 
 def handle_exceptions(model_name: str):
-    """通用异常处理装饰器"""
+    """
+    urls层通用异常处理装饰器
+    统一返回500报错
+    """
     def decorator(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
