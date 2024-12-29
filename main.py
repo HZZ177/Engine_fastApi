@@ -1,3 +1,4 @@
+import tortoise
 import uvicorn
 from fastapi import FastAPI
 from apps.lora_node.urls import lora_router
@@ -8,6 +9,8 @@ from apps.network_led.urls import network_led_router
 from apps.network_lcd.urls import network_lcd_router
 from core.events import register_startup_and_shutdown_events
 from core.middleware import RequestLoggingMiddleware
+from tortoise.contrib.fastapi import register_tortoise
+from core.settings import TORTOISE_ORM
 
 # 初始化FastAPI实例
 app = FastAPI()
@@ -17,6 +20,9 @@ register_startup_and_shutdown_events(app)
 
 # 注册中间件
 app.add_middleware(RequestLoggingMiddleware)    # 日志记录每个请求信息
+
+# 注册tortoise
+register_tortoise(app, config=TORTOISE_ORM)
 
 # 注册路由
 app.include_router(lora_router, prefix="/lora_node", tags=["lora节点相关接口"])

@@ -7,7 +7,7 @@
 # @description:
 
 import os
-from core.logger import logger
+# from core.logger import logger
 
 '''项目目录'''
 # 项目根目录，指向device_simulation_engine
@@ -25,14 +25,14 @@ dev_config_path = os.path.abspath(os.path.join(core_path, 'config_dev.yml'))    
 pro_config_path = os.path.abspath(os.path.join(core_path, 'config_pro.yml'))     # 正式环境配置文件
 db_path = os.path.abspath(os.path.join(sqlite_path, 'findcar_automation.db'))
 
-# 检测数据库跟路径是否存在，不存在则创建一个空路径
-if not os.path.exists(sqlite_path):
-    try:
-        os.makedirs(sqlite_path)
-        logger.info(f"数据库路径不存在，创建成功！")
-    except Exception as e:
-        logger.error(f"创建数据库路径失败：{e}")
-        raise e
+# # 检测数据库跟路径是否存在，不存在则创建一个空路径
+# if not os.path.exists(sqlite_path):
+#     try:
+#         os.makedirs(sqlite_path)
+#         logger.info(f"数据库路径不存在，创建成功！")
+#     except Exception as e:
+#         logger.error(f"创建数据库路径失败：{e}")
+#         raise e
 
 
 if __name__ == '__main__':
