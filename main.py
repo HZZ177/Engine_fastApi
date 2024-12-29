@@ -1,4 +1,5 @@
-import tortoise
+import sys
+
 import uvicorn
 from fastapi import FastAPI
 from apps.lora_node.urls import lora_router
@@ -21,7 +22,7 @@ register_startup_and_shutdown_events(app)
 # 注册中间件
 app.add_middleware(RequestLoggingMiddleware)    # 日志记录每个请求信息
 
-# 注册tortoise
+# 注册tortoise，关联orm和框架
 register_tortoise(app, config=TORTOISE_ORM)
 
 # 注册路由
@@ -31,7 +32,6 @@ app.include_router(four_bytes_node_router, prefix="/four_bytes_node", tags=["四
 app.include_router(parking_camera_router, prefix="/parking_camera", tags=["车位相机相关接口"])
 app.include_router(network_led_router, prefix="/network_led", tags=["LED网络屏相关接口"])
 app.include_router(network_lcd_router, prefix="/network_lcd", tags=["LCD一体屏相关接口"])
-#
 
 if __name__ == "__main__":
     uvicorn.run(app="main:app", host="127.0.0.1", port=8000, reload=True)

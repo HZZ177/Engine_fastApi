@@ -85,7 +85,7 @@ class AlarmReportModel(BaseModel):
 
     @field_validator("message")
     @classmethod
-    def transform_park_event(cls, v: CameraFaultType):
+    def transform_message(cls, v: CameraFaultType):
         """转换字段成员对象为真实值，方便后续使用"""
         return v.value
 
@@ -105,13 +105,13 @@ class CarTriggerEventModel(BaseModel):
 
     @field_validator("triggerFlag")
     @classmethod
-    def transform_park_event(cls, v: CarTriggerFlag):
+    def transform_trigger_flag(cls, v: CarTriggerFlag):
         """转换字段成员对象为真实值，方便后续使用"""
         return v.value
 
     @field_validator("carColour")
     @classmethod
-    def transform_park_event(cls, v: CarColour):
+    def transform_car_colour(cls, v: CarColour):
         """转换字段成员对象为真实值，方便后续使用"""
         return v.value
 
@@ -129,7 +129,7 @@ class CarTrafficEventModel(BaseModel):
 
     @field_validator("areaState")
     @classmethod
-    def transform_park_event(cls, v: AreaState):
+    def transform_area_state(cls, v: AreaState):
         """转换字段成员对象为真实值，方便后续使用"""
         return v.value
 

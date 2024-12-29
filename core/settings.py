@@ -7,11 +7,10 @@
 # @description:
 
 from core.file_path import db_path
-print(db_path)
 
 # 注册的模型
 INSTALLED_MODELS = [
-    "apps.network_led.models"
+    "apps.models"
 ]
 
 # tortoise基本配置

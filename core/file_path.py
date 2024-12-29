@@ -16,14 +16,13 @@ project_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 '''一级目录'''
 apps_path = os.path.abspath(os.path.join(project_path, 'apps'))     # app根目录
 core_path = os.path.abspath(os.path.join(project_path, 'core'))     # core目录
-sqlite_path = os.path.abspath(os.path.join(project_path, 'SQlite'))     # SQlite数据库目录
+db_path = os.path.abspath(os.path.join(project_path, 'findcar_automation.sqlite3'))     # SQlite数据库目录
 log_path = os.path.abspath(os.path.join(project_path, 'logs'))      # 日志目录
 static_path = os.path.abspath(os.path.join(project_path, 'static'))     # 资源目录
 
 '''二级目录'''
 dev_config_path = os.path.abspath(os.path.join(core_path, 'config_dev.yml'))     # 开发环境配置文件
 pro_config_path = os.path.abspath(os.path.join(core_path, 'config_pro.yml'))     # 正式环境配置文件
-db_path = os.path.abspath(os.path.join(sqlite_path, 'findcar_automation.db'))
 
 # # 检测数据库跟路径是否存在，不存在则创建一个空路径
 # if not os.path.exists(sqlite_path):
@@ -36,5 +35,5 @@ db_path = os.path.abspath(os.path.join(sqlite_path, 'findcar_automation.db'))
 
 
 if __name__ == '__main__':
-    print(project_path)
+    print(db_path)
     # pass

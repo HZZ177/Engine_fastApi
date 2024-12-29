@@ -29,7 +29,7 @@ class ReportStatusModel(BaseModel):
 
     @field_validator("sensorStatus")
     @classmethod
-    def transform_park_event(cls, v: ReportStatus):
+    def transform_sensor_status(cls, v: ReportStatus):
         """转换字段成员对象为真实值，方便后续使用"""
         return v.value
 
