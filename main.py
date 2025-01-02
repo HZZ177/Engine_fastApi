@@ -8,6 +8,7 @@ from apps.four_bytes_node.urls import four_bytes_node_router
 from apps.parking_camera.urls import parking_camera_router
 from apps.network_led.urls import network_led_router
 from apps.network_lcd.urls import network_lcd_router
+from apps.receive_report_server.urls import receive_report_router
 from core.events import register_startup_and_shutdown_events
 from core.middleware import RequestLoggingMiddleware
 from tortoise.contrib.fastapi import register_tortoise
@@ -23,7 +24,7 @@ register_startup_and_shutdown_events(app)
 app.add_middleware(RequestLoggingMiddleware)    # 日志记录每个请求信息
 
 # 注册tortoise，关联orm和框架
-register_tortoise(app, config=TORTOISE_ORM)
+register_tortoise(app, config=TORTOISE_ORM, generate_schemas=True)
 
 # 注册路由
 app.include_router(lora_router, prefix="/lora_node", tags=["lora节点相关接口"])
@@ -32,6 +33,7 @@ app.include_router(four_bytes_node_router, prefix="/four_bytes_node", tags=["四
 app.include_router(parking_camera_router, prefix="/parking_camera", tags=["车位相机相关接口"])
 app.include_router(network_led_router, prefix="/network_led", tags=["LED网络屏相关接口"])
 app.include_router(network_lcd_router, prefix="/network_lcd", tags=["LCD一体屏相关接口"])
+app.include_router(receive_report_router, prefix="/receive_report", tags=["接收上报相关接口"])
 
 if __name__ == "__main__":
     uvicorn.run(app="main:app", host="127.0.0.1", port=8000, reload=True)

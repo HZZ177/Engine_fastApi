@@ -5,7 +5,7 @@
 # @File    : util.py
 # @Software: PyCharm
 # @description:
-
+import asyncio
 import re
 import uuid
 from functools import wraps
@@ -38,17 +38,20 @@ def generate_uuid():
 
 def handle_exceptions(model_name: str):
     """
-    urls层通用异常处理装饰器
+    urls层通用异常处理装饰器，兼容同步函数和异步函数两种执行方式
     统一返回500报错
     """
     def decorator(func):
         @wraps(func)
-        def wrapper(*args, **kwargs):
+        async def wrapper(*args, **kwargs):  # 让 wrapper 成为异步函数
             try:
-                return func(*args, **kwargs)
+                if hasattr(func, '__call__') and asyncio.iscoroutinefunction(func):
+                    return await func(*args, **kwargs)  # 如果是异步函数，使用 await
+                else:
+                    return func(*args, **kwargs)  # 否则直接调用同步函数
             except Exception as e:
                 logger.exception(f"{model_name}被调用时发生异常: {e}")
-                return HTTPException(status_code=500, detail=f"{model_name}被调用时发生异常")
+                raise HTTPException(status_code=500, detail=f"{model_name}被调用时发生异常")
         return wrapper
     return decorator
 

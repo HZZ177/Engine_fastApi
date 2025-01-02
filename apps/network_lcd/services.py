@@ -10,8 +10,8 @@ import threading
 from core.connections.websocket_connection import WebSocketClient
 from .protocols import NetworkLcdModel
 from core.logger import logger
-from core.connections.db_connection import DBConnection
 from core.file_path import db_path
+from ..models import DeviceMessageModel
 
 
 class NetworkLcdService:
@@ -26,7 +26,6 @@ class NetworkLcdService:
         self.heartbeat_interval = 5  # 心跳间隔时间，单位为秒
         self.timer = None       # 用于定时发送心跳包的定时器
         self.network_lcd_model = NetworkLcdModel()  # LCD一体屏数据模型实例
-        self.db_path = db_path
 
     def connect(self):
         status = self.client.is_connected()
@@ -69,7 +68,7 @@ class NetworkLcdService:
             self.timer = threading.Timer(self.heartbeat_interval, self.schedule_next_heartbeat)
             self.timer.start()
 
-    def handle_received_data(self, data):
+    async def handle_received_data(self, data):
         """接收到服务器数据时的处理函数"""
         logger.debug(f"LCD一体屏收到来自服务器的数据，原始数据： {data}")
         # 根据数据内容进行处理
@@ -91,43 +90,27 @@ class NetworkLcdService:
             logger.info(f"LCD一体屏指令响应包发送成功，reqid：{reqid}")
 
             # 将接收到的服务器下发的指令录入数据库
-            self.store_received_command(data)
+            await self.store_received_command(data)
             logger.info(f"LCD一体屏录入接收到的下发指令到数据库成功{data}")
 
         except Exception as e:
             logger.exception(f"LCD一体屏解析服务器下发数据失败: {e}")
 
-    def store_received_command(self, command_data):
-        """
-        将接收到的服务器下发的lcd数据写入数据库
-        :param command_data: 服务器下发的屏显示数据
-        :return: None
-        """
-        # 在使用时创建数据库连接，提前创建会有跨线程问题
-        db = DBConnection(self.db_path)  # 初始化数据库连接
-        with db:
-            insert_sql = "INSERT INTO device_message (device_addr, message_source, message) VALUES (?, ?, ?)"
-            db.execute(insert_sql, (self.local_ip, 4, command_data))
+    async def store_received_command(self, command_data):
+        """将接收到的服务器下发的lcd数据写入数据库"""
+        await DeviceMessageModel.create(device_addr=self.local_ip, message_source=4, message=command_data)
 
-    def get_db_command_message(self, page_no, page_size):
-        """
-        查询数据库中记录的服务器对屏下发的命令消息
-        :return: 查询结果
-        """
-        # 计算分页偏移量
-        offset = (page_no - 1) * page_size
-        sql = f"""
-            SELECT * FROM device_message
-            WHERE message_source=4
-            ORDER BY create_time DESC
-            LIMIT {page_size} OFFSET {offset}
-        """
-        try:
-            db = DBConnection(self.db_path)
-            with db:
-                return db.fetchall_as_dict(sql)
-        except Exception as e:
-            raise e
+    @staticmethod
+    async def get_db_command_message(page_no, page_size):
+        """查询数据库中记录的服务器对屏下发的命令消息"""
+        result = await (
+            DeviceMessageModel.filter(message_source=4)
+            .order_by('-create_time')
+            .offset((page_no-1)*page_size)
+            .limit(page_size)
+            .values()
+        )
+        return result
 
     def disconnect(self):
         try:

@@ -79,7 +79,7 @@ def stop_heartbeat():
 
 @network_lcd_router.post("/getHistoryCommandMessage", summary="查询服务器给该屏下发的历史指令")
 @handle_exceptions(model_name="LCD一体屏相关接口")
-def get_history_command_message(data: GetHistoryCommandMessageModel):
+async def get_history_command_message(data: GetHistoryCommandMessageModel):
     """
     查询数据库中记录的服务器对屏下发的命令消息
     必填参数：
@@ -90,6 +90,6 @@ def get_history_command_message(data: GetHistoryCommandMessageModel):
     page_size = data.pageSize
 
     network_lcd = get_network_lcd()
-    result = network_lcd.get_db_command_message(page_no, page_size)
+    result = await network_lcd.get_db_command_message(page_no, page_size)
     logger.info(f"LCD一体屏查询服务器对屏下发的历史命令消息成功，返回结果：{result}")
     return return_success_response(message="成功", data=result)

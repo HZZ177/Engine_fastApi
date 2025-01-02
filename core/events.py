@@ -9,9 +9,7 @@
 import psutil
 import socket
 from fastapi import FastAPI
-from core.connections.db_connection import DBConnection
 from core.device_manager import DeviceManager
-from core.file_path import db_path
 from core.logger import logger
 from core.configer import config
 
@@ -66,13 +64,6 @@ def register_startup_and_shutdown_events(app: FastAPI):
                 logger.info("所有设备初始化成功")
             except Exception as e:
                 raise Exception(f"设备初始化失败: {e}")
-
-            # 初始化sqlite
-            try:
-                DBConnection(db_path).init()
-                logger.info("sqlite初始化成功")
-            except Exception as e:
-                raise Exception(f"sqlite初始化失败: {e}")
 
         except Exception as e:
             logger.exception(f"引擎初始化失败: {e}")

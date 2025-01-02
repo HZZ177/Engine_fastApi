@@ -11,9 +11,8 @@ import threading
 import tortoise
 
 from core.connections.tcp_connection import TCPClient
-from protocols import NetworkLedModel
+from .protocols import NetworkLedModel
 from core.logger import logger
-from core.connections.db_connection import DBConnection
 from core.file_path import db_path
 from apps.models import DeviceMessageModel
 
@@ -31,7 +30,6 @@ class NetworkLedService:
         self.heartbeat_interval = 30  # 心跳间隔时间，单位为秒
         self.timer = None  # 用于定时发送心跳包的定时器
         self.network_led_model = NetworkLedModel()  # 网络LED屏数据模型实例
-        self.db_path = db_path
 
     def connect(self):
         status = self.client.is_connected()
@@ -88,7 +86,7 @@ class NetworkLedService:
             )
             self.timer.start()
 
-    def handle_received_data(self, data):
+    async def handle_received_data(self, data):
         """接收到服务器数据时的处理函数"""
         logger.debug(f"LED网络屏收到来自服务器的数据，开始解包 {data}")
         # 根据数据内容进行处理
@@ -102,7 +100,7 @@ class NetworkLedService:
                 logger.info(f"LED网络屏收到服务器下发的屏显示包：{parsed_data}")
                 # 下发的屏显示数据写入数据库
                 command_data = parsed_data.get("data_content")  # 提取屏显示指令部分
-                self.store_received_command(command_data)
+                await self.store_received_command(command_data)
                 logger.info(f"LED网络屏写入接收指令到数据库成功：{command_data}")
             else:
                 logger.info(
@@ -111,41 +109,21 @@ class NetworkLedService:
         except Exception as e:
             logger.exception(f"LED网络屏解析服务器下发数据失败: {e}")
 
-    def store_received_command(self, command_data):
+    async def store_received_command(self, command_data):
         """
         将接收到的服务器下发的led数据写入数据库
         :param command_data: 服务器下发的屏显示数据
         :return: None
         """
-        # 在使用时创建数据库连接，提前创建会有跨线程问题
-        # db = DBConnection(self.db_path)  # 初始化数据库连接
-        # with db:
-        #     insert_sql = "INSERT INTO device_message (device_addr, message_source, message) VALUES (?, ?, ?)"
-        #     db.execute(insert_sql, (self.local_ip, 3, command_data))
-        DeviceMessageModel.create(
-            device_addr=self.local_ip, message_source=3, message=command_data
-        )
+        await DeviceMessageModel.create(device_addr=self.local_ip, message_source=3, message=command_data)
 
-    def get_db_command_message(self, page_no, page_size):
+    @staticmethod
+    async def get_db_command_message(page_no, page_size):
         """
         查询数据库中记录的服务器对屏下发的命令消息
         :return: 查询结果
         """
-        # # 计算分页偏移量
-        # offset = (page_no - 1) * page_size
-        # sql = f"""
-        #     SELECT * FROM device_message
-        #     WHERE message_source=3
-        #     ORDER BY create_time DESC
-        #     LIMIT {page_size} OFFSET {offset}
-        # """
-        # try:
-        #     db = DBConnection(self.db_path)
-        #     with db:
-        #         return db.fetchall_as_dict(sql)
-        # except Exception as e:
-        #     raise e
-        result = (
+        result = await (
             DeviceMessageModel.filter(message_source=3)
             .order_by("-create_time")
             .offset((page_no - 1) * page_size)
@@ -160,27 +138,3 @@ class NetworkLedService:
             self.client.disconnect()
         except Exception as e:
             raise e
-
-
-if __name__ == "__main__":
-
-    async def query_db():
-        await tortoise.Tortoise.init(
-            db_url=f"sqlite:///{db_path}",
-            modules={"models": ["apps.models"]},
-        )
-        await tortoise.Tortoise.generate_schemas()
-
-        page_no, page_size = 1, 10
-        result = (
-            await DeviceMessageModel.filter(message_source=3)
-            .order_by("-create_time")
-            .offset((page_no - 1) * page_size)
-            .limit(page_size)
-            .values()
-        )
-
-        print(result)
-
-    from tortoise import run_async
-    run_async(query_db())
